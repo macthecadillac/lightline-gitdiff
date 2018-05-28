@@ -1,11 +1,10 @@
 " TODO: process stdout and stderr separately
-" TODO: scope lightline#git#status to the buffers
 
 " initialize global variables
-let g:lightline#git#status = [0, 0, 0]
-let g:indicator_added = get(g:, 'lightline#git#indicator_added','+')
-let g:indicator_modified = get(g:, 'lightline#git#indicator_modified', '!')
-let g:indicator_deleted = get(g:, 'lightline#git#indicator_deleted', '-')
+let s:indicator_added = get(g:, 'lightline#git#indicator_added','+')
+let s:indicator_modified = get(g:, 'lightline#git#indicator_modified', '!')
+let s:indicator_deleted = get(g:, 'lightline#git#indicator_deleted', '-')
+let s:min_winwidth = get(g:, 'lightline#git#min_winwidth', 70)
 let s:file_whitelist = {}
 
 augroup lightline#git
@@ -108,18 +107,21 @@ function! s:update_status(git_raw_output)
         let l:deletions = s:str2nr(l:matched[4])
         let l:added = l:insertions - l:modified
         let l:deleted = l:deletions - l:modified
-        let g:lightline#git#status = [l:added, l:modified, l:deleted]
+        let b:lightline_git_status = [l:added, l:modified, l:deleted]
     endif
     call lightline#update()
 endfunction
 
 function! lightline#git#get_status()
-    let [l:added, l:modified, l:deleted] = g:lightline#git#status
+    if !has_key(b:, 'lightline_git_status')
+        let b:lightline_git_status = [0, 0, 0]
+    endif
+    let [l:added, l:modified, l:deleted] = b:lightline_git_status
     let l:curr_full_path = expand('%:p')
-    if get(s:file_whitelist, l:curr_full_path)
-        return g:indicator_added . ' ' . l:added . ' ' .
-        \      g:indicator_modified . ' ' . l:modified . ' ' .
-        \      g:indicator_deleted . ' ' . l:deleted
+    if get(s:file_whitelist, l:curr_full_path) && winwidth(0) > s:min_winwidth
+        return s:indicator_added . ' ' . l:added . ' ' .
+        \      s:indicator_modified . ' ' . l:modified . ' ' .
+        \      s:indicator_deleted . ' ' . l:deleted
     else
         return ''
     endif
