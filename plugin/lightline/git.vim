@@ -2,9 +2,9 @@
 
 " initialize global variables
 let g:lightline#git#status = [0, 0, 0]
-let g:lightline#git#status#indicator_added = '+'
-let g:lightline#git#status#indicator_modified = '!'
-let g:lightline#git#status#indicator_deleted = '-'
+let g:indicator_added = get(g:, 'lightline#git#indicator_added','+')
+let g:indicator_modified = get(g:, 'lightline#git#indicator_modified', '!')
+let g:indicator_deleted = get(g:, 'lightline#git#indicator_deleted', '-')
 let s:file_whitelist = {}
 
 augroup lightline#git
@@ -116,9 +116,9 @@ function! lightline#git#get_status()
     let [l:added, l:modified, l:deleted] = g:lightline#git#status
     let l:curr_full_path = expand('%:p')
     if get(s:file_whitelist, l:curr_full_path)
-        return g:lightline#git#status#indicator_added . ' ' . l:added . ' ' .
-        \      g:lightline#git#status#indicator_modified . ' ' . l:modified . ' ' .
-        \      g:lightline#git#status#indicator_deleted . ' ' . l:deleted
+        return g:indicator_added . ' ' . l:added . ' ' .
+        \      g:indicator_modified . ' ' . l:modified . ' ' .
+        \      g:indicator_deleted . ' ' . l:deleted
     else
         return ''
     endif
