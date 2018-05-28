@@ -1,3 +1,5 @@
+" TODO: process stdout and stderr separately
+
 " initialize global variables
 let g:lightline#git#status = [0, 0, 0]
 let g:lightline#git#status#indicator_added = '+'
@@ -27,14 +29,17 @@ function! s:job_exit(job_id, data, event) dict
 endfunction
 
 function! s:query_git()
-    let l:cmd = 'git diff --compact-summary --word-diff=porcelain ' .
-    \           '--no-color --no-ext-diff -U0 -- ' . expand('%:f')
-    let l:callbacks = {
-    \       'on_stdout': function('s:job_stdout'),
-    \       'on_stderr': function('s:job_stderr'),
-    \       'on_exit': function('s:job_exit')
-    \ }
-    let l:job_id = jobstart(l:cmd, extend({'output': ''}, l:callbacks))
+    let l:filename = expand('%:f')
+    if l:filename !=# ''
+        let l:cmd = 'git diff --compact-summary --word-diff=porcelain ' .
+        \           '--no-color --no-ext-diff -U0 -- ' . l:filename
+        let l:callbacks = {
+        \       'on_stdout': function('s:job_stdout'),
+        \       'on_stderr': function('s:job_stderr'),
+        \       'on_exit': function('s:job_exit')
+        \ }
+        let l:job_id = jobstart(l:cmd, extend({'output': ''}, l:callbacks))
+    endif
 endfunction
 
 function! s:modified_count(hunks)
