@@ -31,7 +31,7 @@ endfunction
 function! s:query_git()
     let l:filename = expand('%:f')
     if l:filename !=# ''
-        let l:cmd = 'git diff --compact-summary --word-diff=porcelain ' .
+        let l:cmd = 'git diff --stat --word-diff=porcelain ' .
         \           '--no-color --no-ext-diff -U0 -- ' . l:filename
         let l:callbacks = {
         \       'on_stdout': function('s:job_stdout'),
