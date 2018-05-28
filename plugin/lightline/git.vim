@@ -1,4 +1,5 @@
 " TODO: process stdout and stderr separately
+" TODO: scope lightline#git#status to the buffers
 
 " initialize global variables
 let g:lightline#git#status = [0, 0, 0]
