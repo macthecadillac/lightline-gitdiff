@@ -121,8 +121,8 @@ function! lightline#git#get_status()
   let l:curr_full_path = expand('%:p')
   if get(s:file_whitelist, l:curr_full_path) && winwidth(0) > s:min_winwidth
     return s:indicator_added . ' ' . l:added . ' ' .
-    \    s:indicator_modified . ' ' . l:modified . ' ' .
-    \    s:indicator_deleted . ' ' . l:deleted
+    \      s:indicator_modified . ' ' . l:modified . ' ' .
+    \      s:indicator_deleted . ' ' . l:deleted
   else
     return ''
   endif
