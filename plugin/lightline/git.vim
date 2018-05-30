@@ -1,4 +1,3 @@
-" TODO: process stdout and stderr separately
 " TODO: implement job-kill to prevent racing in rare situations
 
 " initialize global variables
@@ -18,15 +17,15 @@ function! s:job_stdout(job_id, data, event) dict
   " Couldn't get 'join' to insert linebreaks so '\n' is my token
   " for line breaks. The chance of it appearing in actual programs is
   " minimal
-  let l:self.output = l:self.output . join(a:data, '\n')
+  let l:self.stdout = l:self.stdout . join(a:data, '\n')
 endfunction
 
 function! s:job_stderr(job_id, data, event) dict
-  let l:self.output = l:self.output . join(a:data, '\n')
+  let l:self.stderr = l:self.stderr . join(a:data, '\n')
 endfunction
 
 function! s:job_exit(job_id, data, event) dict
-  call s:update_status(l:self.output)
+  call s:update_status(l:self)
 endfunction
 
 function! s:query_git()
@@ -39,7 +38,8 @@ function! s:query_git()
     \   'on_stderr': function('s:job_stderr'),
     \   'on_exit': function('s:job_exit')
     \ }
-    let l:job_id = jobstart(l:cmd, extend({'output': ''}, l:callbacks))
+    let l:job_id = jobstart(l:cmd, extend({'stdout': '', 'stderr': ''},
+    \                                     l:callbacks))
   endif
 endfunction
 
@@ -70,19 +70,12 @@ function! s:str2nr(str)
 endfunction
 
 function! s:track_file(git_raw_output)
-  " Nothing has changed since last commit/file in a git repo but not in git
-  " tree
-  if a:git_raw_output ==# ''
+  " file not in repository
+  if a:git_raw_output.stderr !=# ''
     return 0
-  " If file is readonly or that the dir is not a git repo
   else
-    let l:orphan = !&modifiable
-    \ || split(a:git_raw_output, '\\n')[0] ==# 'Not a git repository'
-    if l:orphan
-      return 0
-    else
-      return 1
-    endif
+    " return 0 if file in repo but not tracked
+    return a:git_raw_output.stdout !=# '' ? 1 : 0
   endif
 endfunction
 
@@ -91,7 +84,7 @@ function! s:update_status(git_raw_output)
   let s:file_whitelist[l:curr_full_path] = s:track_file(a:git_raw_output)
 
   if s:file_whitelist[l:curr_full_path] ==# 1
-    let l:split_diff = split(a:git_raw_output, '@@')
+    let l:split_diff = split(a:git_raw_output.stdout, '@@')
     let l:nhunks = (len(l:split_diff) - 1) / 2
 
     let l:header = l:split_diff[0]
