@@ -69,7 +69,7 @@ function! s:str2nr(str)
   return empty(str2nr(a:str)) ? 0 : str2nr(a:str)
 endfunction
 
-function! s:track_file(git_raw_output)
+function! s:whitelist_file(git_raw_output)
   " file not in repository
   if a:git_raw_output.stderr !=# ''
     return 0
@@ -81,7 +81,7 @@ endfunction
 
 function! s:update_status(git_raw_output)
   let l:curr_full_path = expand('%:p')
-  let s:file_whitelist[l:curr_full_path] = s:track_file(a:git_raw_output)
+  let s:file_whitelist[l:curr_full_path] = s:whitelist_file(a:git_raw_output)
 
   if s:file_whitelist[l:curr_full_path] ==# 1
     let l:split_diff = split(a:git_raw_output.stdout, '@@')
