@@ -1,18 +1,3 @@
-" TODO: implement job-kill to prevent racing in rare situations
-
-" initialize global variables
-let s:indicator_added = get(g:, 'lightline#git#indicator_added','+')
-let s:indicator_modified = get(g:, 'lightline#git#indicator_modified', '!')
-let s:indicator_deleted = get(g:, 'lightline#git#indicator_deleted', '-')
-let s:min_winwidth = get(g:, 'lightline#git#min_winwidth', 70)
-let s:file_whitelist = {}
-
-augroup lightline#git
-  autocmd!
-  autocmd BufEnter * call s:query_git()
-  autocmd BufWrite * call s:query_git()
-augroup END
-
 function! s:job_stdout(job_id, data, event) dict
   " Couldn't get 'join' to insert linebreaks so '\n' is my token
   " for line breaks. The chance of it appearing in actual programs is
@@ -28,7 +13,7 @@ function! s:job_exit(job_id, data, event) dict
   call s:update_status(l:self)
 endfunction
 
-function! s:query_git()
+function! lightline_git#query_git()
   let l:filename = expand('%:f')
   if l:filename !=# ''
     let l:cmd = 'git diff --stat --word-diff=porcelain ' .
@@ -81,9 +66,9 @@ endfunction
 
 function! s:update_status(git_raw_output)
   let l:curr_full_path = expand('%:p')
-  let s:file_whitelist[l:curr_full_path] = s:whitelist_file(a:git_raw_output)
+  let g:file_whitelist[l:curr_full_path] = s:whitelist_file(a:git_raw_output)
 
-  if s:file_whitelist[l:curr_full_path] ==# 1
+  if g:file_whitelist[l:curr_full_path] ==# 1
     let l:split_diff = split(a:git_raw_output.stdout, '@@')
     let l:nhunks = (len(l:split_diff) - 1) / 2
 
@@ -106,16 +91,16 @@ function! s:update_status(git_raw_output)
   call lightline#update()
 endfunction
 
-function! lightline#git#get_status()
+function! lightline_git#get_status()
   if !has_key(b:, 'lightline_git_status')
     let b:lightline_git_status = [0, 0, 0]
   endif
   let [l:added, l:modified, l:deleted] = b:lightline_git_status
   let l:curr_full_path = expand('%:p')
-  if get(s:file_whitelist, l:curr_full_path) && winwidth(0) > s:min_winwidth
-    return s:indicator_added . ' ' . l:added . ' ' .
-    \      s:indicator_modified . ' ' . l:modified . ' ' .
-    \      s:indicator_deleted . ' ' . l:deleted
+  if get(g:file_whitelist, l:curr_full_path) && winwidth(0) > g:min_winwidth
+    return g:indicator_added . ' ' . l:added . ' ' .
+    \      g:indicator_modified . ' ' . l:modified . ' ' .
+    \      g:indicator_deleted . ' ' . l:deleted
   else
     return ''
   endif
