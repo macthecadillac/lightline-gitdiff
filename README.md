@@ -25,7 +25,7 @@ Vim8 with some minor modifications.
 Add the following line to your `init.vim`
 
 ```vim
-Plug 'macthecadillac/lightline-git'
+Plug 'macthecadillac/lightline-gitdiff'
 ```
 
 ## Configuration
