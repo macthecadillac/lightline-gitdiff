@@ -10,7 +10,7 @@ function! s:job_exit(job_id, data, event) dict
   call s:update_status(l:self)
 endfunction
 
-function! lightline_git#query_git()
+function! lightline_gitdiff#query_git()
   let l:filename = expand('%:f')
   if l:filename !=# ''
     let l:cmd = 'git diff --stat --word-diff=porcelain ' .
@@ -96,7 +96,7 @@ function! s:update_status(git_raw_output)
   call lightline#update()
 endfunction
 
-function! lightline_git#get_status()
+function! lightline_gitdiff#get_status()
   if !has_key(b:, 'lightline_git_status')
     let b:lightline_git_status = [0, 0, 0]
   endif
