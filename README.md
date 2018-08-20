@@ -7,9 +7,9 @@ changes since the last commit.
 
 #### Git
 
-Lightline-git is known to work with git 2.11 or above. This plugin was tested on
-Debian 9 and testing. Older versions of git should work but that is not
-guaranteed.
+Lightline-gitdiff is known to work with git 2.11 or above. This plugin was
+tested on Debian 9 and testing. Older versions of git should work but that is
+not guaranteed.
 
 #### Neovim
 
