@@ -1,12 +1,9 @@
 function! s:job_stdout(job_id, data, event) dict
-  " Couldn't get 'join' to insert linebreaks so '\n' is my token
-  " for line breaks. The chance of it appearing in actual programs is
-  " minimal
-  let l:self.stdout = l:self.stdout . join(a:data, '\n')
+  let l:self.stdout = l:self.stdout + a:data
 endfunction
 
 function! s:job_stderr(job_id, data, event) dict
-  let l:self.stderr = l:self.stderr . join(a:data, '\n')
+  let l:self.stderr = l:self.stderr + a:data
 endfunction
 
 function! s:job_exit(job_id, data, event) dict
@@ -23,30 +20,47 @@ function! lightline_git#query_git()
     \   'on_stderr': function('s:job_stderr'),
     \   'on_exit': function('s:job_exit')
     \ }
-    let l:job_id = jobstart(l:cmd, extend({'stdout': '', 'stderr': ''},
+    let l:job_id = jobstart(l:cmd, extend({'stdout': [], 'stderr': []},
     \                                     l:callbacks))
   endif
 endfunction
 
-function! s:modified_count(hunks)
+function! s:modified_count(stdout)
   let l:modified = 0
-  for l:hunk in a:hunks
-    for l:line in split(l:hunk, '\~')
-      let l:plus = 0
-      let l:minus = 0
-      for l:chunk in split(l:line, '\\n')
-        let l:firstchar  = l:chunk[0]
-        if l:firstchar ==# '+'
-          let l:plus = l:plus + 1
-        elseif l:firstchar ==# '-'
-          let l:minus = l:minus + 1
-        endif
-      endfor
-      if l:plus !=# 0 && l:minus !=# 0
+  let l:plus = 0
+  let l:minus = 0
+  let l:blank = 0
+  let l:counting = 0  " true/false (are we supposed to count the current line?)
+
+  for l:output_line in a:stdout
+    let l:firstchar = l:output_line[0]
+
+    " start counting after the first '@' mark
+    if l:firstchar ==# '@' && l:counting ==# 0
+      let l:counting = 1
+    elseif l:firstchar ==# '+' && l:counting ==# 1
+      let l:plus = l:plus + 1
+    elseif l:firstchar ==# '-' && l:counting ==# 1
+      let l:minus = l:minus + 1
+    elseif l:firstchar ==# ' ' && l:counting ==# 1
+      let l:blank = l:blank + 1
+    " determine if the line was added/deleted/modified at the end of a line
+    elseif l:firstchar ==# '~' && l:counting ==# 1
+      if l:blank !=# 0
+        let l:modified = l:modified + 1
+      elseif l:plus !=# 0 && l:minus !=# 0
+        let l:modified = l:modified + 1
+      elseif l:plus ==# 0 && l:minus ==# 0
         let l:modified = l:modified + 1
       endif
-    endfor
+
+      " reset counters at the end of each line
+      let l:plus = 0
+      let l:minus = 0
+      let l:blank = 0
+    endif
   endfor
+
   return l:modified
 endfunction
 
@@ -56,11 +70,11 @@ endfunction
 
 function! s:whitelist_file(git_raw_output)
   " file not in repository
-  if a:git_raw_output.stderr !=# ''
+  if a:git_raw_output.stderr !=# ['']
     return 0
   else
     " return 0 if file in repo but not tracked
-    return a:git_raw_output.stdout !=# '' ? 1 : 0
+    return a:git_raw_output.stdout !=# [''] ? 1 : 0
   endif
 endfunction
 
@@ -69,17 +83,8 @@ function! s:update_status(git_raw_output)
   let g:file_whitelist[l:curr_full_path] = s:whitelist_file(a:git_raw_output)
 
   if g:file_whitelist[l:curr_full_path] ==# 1
-    let l:split_diff = split(a:git_raw_output.stdout, '@@')
-    let l:nhunks = (len(l:split_diff) - 1) / 2
-
-    let l:header = l:split_diff[0]
-    let l:hunks = []
-    for l:idx in range(1, l:nhunks)
-      call add(l:hunks, l:split_diff[2 * l:idx])
-    endfor
-
-    let l:modified = s:modified_count(l:hunks)
-    let l:change_summary = split(l:header, '\\n')[1]
+    let l:modified = s:modified_count(a:git_raw_output.stdout)
+    let l:change_summary = a:git_raw_output.stdout[1]
     let l:regex = '\v[^,]+, ((\d+) [a-z]+\(\+\)[, ]*)?((\d+) [a-z]+\(-\))?'
     let l:matched =  matchlist(l:change_summary, l:regex)
     let l:insertions = s:str2nr(l:matched[2])
