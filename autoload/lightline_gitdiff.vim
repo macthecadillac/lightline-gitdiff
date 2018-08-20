@@ -50,6 +50,7 @@ function! s:modified_count(stdout)
         let l:modified = l:modified + 1
       elseif l:plus !=# 0 && l:minus !=# 0
         let l:modified = l:modified + 1
+      " for added empty lines
       elseif l:plus ==# 0 && l:minus ==# 0
         let l:modified = l:modified + 1
       endif
@@ -91,6 +92,16 @@ function! s:update_status(git_raw_output)
     let l:deletions = s:str2nr(l:matched[4])
     let l:added = l:insertions - l:modified
     let l:deleted = l:deletions - l:modified
+
+    " a partial fix for edge cases where the git internal word-diff algorithm
+    " goes wrong
+    if l:added <# 0 || l:deleted <# 0
+      let l:negativity = min([l:added, l:deleted])
+      let l:added = l:added - l:negativity
+      let l:deleted = l:deleted - l:negativity
+      let l:modified = l:modified + l:negativity
+    endif
+
     let b:lightline_git_status = [l:added, l:modified, l:deleted]
   endif
   call lightline#update()
