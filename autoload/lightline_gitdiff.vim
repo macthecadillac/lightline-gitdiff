@@ -50,9 +50,6 @@ function! s:modified_count(stdout)
         let l:modified = l:modified + 1
       elseif l:plus !=# 0 && l:minus !=# 0
         let l:modified = l:modified + 1
-      " for added empty lines
-      elseif l:plus ==# 0 && l:minus ==# 0
-        let l:modified = l:modified + 1
       endif
 
       " reset counters at the end of each line
