@@ -33,15 +33,15 @@ Plug 'macthecadillac/lightline-gitdiff'
 ### Available configuration options
 
 ```vim
-let g:lightline_git#indicator_added = '+'
-let g:lightline_git#indicator_deleted = '-'
-let g:lightline_git#indicator_modified = '!'
-let g:lightline_git#min_winwidth = '70'
+let g:lightline_gitdiff#indicator_added = '+'
+let g:lightline_gitdiff#indicator_deleted = '-'
+let g:lightline_gitdiff#indicator_modified = '!'
+let g:lightline_gitdiff#min_winwidth = '70'
 ```
 
 These defaults could be overridden in your `init.vim`.
 
-To integrate with lightline, use `lightline_git#get_status()` as the hook.
+To integrate with lightline, use `lightline_gitdiff#get_status()` as the hook.
 
 ### Example configuration
 
@@ -53,10 +53,10 @@ let g:lightline = {
   \              ['gitbranch', 'gitstatus', 'filename']],
   \   },
   \   'component': {
-  \     'gitstatus': '%<%{lightline_git#get_status()}',
+  \     'gitstatus': '%<%{lightline_gitdiff#get_status()}',
   \   },
   \   'component_visible_condition': {
-  \     'gitstatus': 'lightline_git#get_status() !=# ""',
+  \     'gitstatus': 'lightline_gitdiff#get_status() !=# ""',
   \   },
   \ }
 
