@@ -94,7 +94,7 @@ function! s:update_status(git_raw_output)
     let l:deleted = l:deletions - l:modified
 
     " a partial fix for edge cases where the git internal word-diff algorithm
-    " goes wrong
+    " goes wrong. At least now we won't have negative numbers anymore.
     if l:added <# 0 || l:deleted <# 0
       let l:negativity = min([l:added, l:deleted])
       let l:added = l:added - l:negativity
