@@ -68,11 +68,11 @@ endfunction
 
 function! s:whitelist_file(git_raw_output)
   " file not in repository
-  if a:git_raw_output.stderr !=# ['']
+  if a:git_raw_output.stderr !=# []
     return 0
   else
     " return 0 if file in repo but not tracked
-    return a:git_raw_output.stdout !=# [''] ? 1 : 0
+    return a:git_raw_output.stdout !=# [] ? 1 : 0
   endif
 endfunction
 
