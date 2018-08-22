@@ -67,12 +67,18 @@ function! s:str2nr(str)
 endfunction
 
 function! s:whitelist_file(git_raw_output)
-  " file not in repository
-  if a:git_raw_output.stderr !=# []
-    return 0
-  else
+  " We need to cover both [] and [''] because, due to reasons unbeknownst to me,
+  " git returns [] or [''] on different machines
+  " if file in repository
+  if a:git_raw_output.stderr ==# [] || a:git_raw_output.stderr ==# ['']
     " return 0 if file in repo but not tracked
-    return a:git_raw_output.stdout !=# [] ? 1 : 0
+    if a:git_raw_output.stdout ==# [] || a:git_raw_output.stdout ==# ['']
+      return 0
+    else
+      return 1
+    endif
+  else
+    return 0
   endif
 endfunction
 
