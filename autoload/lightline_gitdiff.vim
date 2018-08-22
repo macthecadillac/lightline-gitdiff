@@ -44,7 +44,7 @@ function! s:modified_count(stdout)
       let l:minus = l:minus + 1
     elseif l:firstchar ==# ' ' && l:counting ==# 1
       let l:blank = l:blank + 1
-    " determine if the line was added/deleted/modified at the end of a line
+    " determine if a line was added/deleted/modified at the end of a line
     elseif l:firstchar ==# '~' && l:counting ==# 1
       if l:blank !=# 0
         let l:modified = l:modified + 1
@@ -97,7 +97,8 @@ function! s:update_status(git_raw_output)
     let l:deleted = l:deletions - l:modified
 
     " a partial fix for edge cases where the git internal word-diff algorithm
-    " goes wrong. At least now we won't have negative numbers anymore.
+    " goes wrong. At least now the function will never return negative numbers
+    " in any circumstances.
     if l:added <# 0 || l:deleted <# 0
       let l:negativity = min([l:added, l:deleted])
       let l:added = l:added - l:negativity
