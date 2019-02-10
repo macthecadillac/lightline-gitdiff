@@ -84,9 +84,9 @@ endfunction
 
 function! s:update_status(git_raw_output)
   let l:curr_full_path = expand('%:p')
-  let g:file_whitelist[l:curr_full_path] = s:whitelist_file(a:git_raw_output)
+  let g:lightline_gitdiff#file_whitelist[l:curr_full_path] = s:whitelist_file(a:git_raw_output)
 
-  if g:file_whitelist[l:curr_full_path] ==# 1
+  if g:lightline_gitdiff#file_whitelist[l:curr_full_path] ==# 1
     let l:modified = s:modified_count(a:git_raw_output.stdout)
     let l:change_summary = a:git_raw_output.stdout[1]
     let l:regex = '\v[^,]+, ((\d+) [a-z]+\(\+\)[, ]*)?((\d+) [a-z]+\(-\))?'
@@ -117,10 +117,10 @@ function! lightline_gitdiff#get_status()
   endif
   let [l:added, l:modified, l:deleted] = b:lightline_git_status
   let l:curr_full_path = expand('%:p')
-  if get(g:file_whitelist, l:curr_full_path) && winwidth(0) > g:min_winwidth
-    return g:indicator_added . ' ' . l:added . ' ' .
-    \      g:indicator_modified . ' ' . l:modified . ' ' .
-    \      g:indicator_deleted . ' ' . l:deleted
+  if get(g:lightline_gitdiff#file_whitelist, l:curr_full_path) && winwidth(0) > g:lightline_gitdiff#min_winwidth
+    return g:lightline_gitdiff#indicator_added . ' ' . l:added . ' ' .
+    \      g:lightline_gitdiff#indicator_modified . ' ' . l:modified . ' ' .
+    \      g:lightline_gitdiff#indicator_deleted . ' ' . l:deleted
   else
     return ''
   endif
