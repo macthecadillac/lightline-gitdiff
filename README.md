@@ -3,6 +3,9 @@
 A minimalistic addon to the great lightline plugin to show a concise summary of
 changes since the last commit.
 
+## TODO
+[ ] Make compatible with vim8
+
 ## Requirements
 
 #### Git
