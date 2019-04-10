@@ -83,32 +83,37 @@ function! s:whitelist_file(git_raw_output)
 endfunction
 
 function! s:update_status(git_raw_output)
-  let l:curr_full_path = expand('%:p')
-  let g:lightline_gitdiff#file_whitelist[l:curr_full_path] = s:whitelist_file(a:git_raw_output)
+  try
+    let l:curr_full_path = expand('%:p')
+    let g:lightline_gitdiff#file_whitelist[l:curr_full_path] = s:whitelist_file(a:git_raw_output)
 
-  if g:lightline_gitdiff#file_whitelist[l:curr_full_path] ==# 1
-    let l:modified = s:modified_count(a:git_raw_output.stdout)
-    let l:change_summary = a:git_raw_output.stdout[1]
-    let l:regex = '\v[^,]+, ((\d+) [a-z]+\(\+\)[, ]*)?((\d+) [a-z]+\(-\))?'
-    let l:matched =  matchlist(l:change_summary, l:regex)
-    let l:insertions = s:str2nr(l:matched[2])
-    let l:deletions = s:str2nr(l:matched[4])
-    let l:added = l:insertions - l:modified
-    let l:deleted = l:deletions - l:modified
+    if g:lightline_gitdiff#file_whitelist[l:curr_full_path] ==# 1
+      let l:modified = s:modified_count(a:git_raw_output.stdout)
+      let l:change_summary = a:git_raw_output.stdout[1]
+      let l:regex = '\v[^,]+, ((\d+) [a-z]+\(\+\)[, ]*)?((\d+) [a-z]+\(-\))?'
+      let l:matched =  matchlist(l:change_summary, l:regex)
+      let l:insertions = s:str2nr(l:matched[2])
+      let l:deletions = s:str2nr(l:matched[4])
+      let l:added = l:insertions - l:modified
+      let l:deleted = l:deletions - l:modified
 
-    " a partial fix for edge cases where the git internal word-diff algorithm
-    " goes wrong. At least now the function will never return negative numbers
-    " in any circumstances.
-    if l:added <# 0 || l:deleted <# 0
-      let l:negativity = min([l:added, l:deleted])
-      let l:added = l:added - l:negativity
-      let l:deleted = l:deleted - l:negativity
-      let l:modified = l:modified + l:negativity
+      " a partial fix for edge cases where the git internal word-diff algorithm
+      " goes wrong. At least now the function will never return negative numbers
+      " in any circumstances.
+      if l:added <# 0 || l:deleted <# 0
+        let l:negativity = min([l:added, l:deleted])
+        let l:added = l:added - l:negativity
+        let l:deleted = l:deleted - l:negativity
+        let l:modified = l:modified + l:negativity
+      endif
+
+      let b:lightline_git_status = [l:added, l:modified, l:deleted]
     endif
-
-    let b:lightline_git_status = [l:added, l:modified, l:deleted]
-  endif
-  call lightline#update()
+  catch
+    let b:lightline_git_status = [0, 0, 0]
+  finally
+    call lightline#update()
+  endtry
 endfunction
 
 function! lightline_gitdiff#get_status()
