@@ -4,7 +4,7 @@ A minimalistic addon to the great lightline plugin to show a concise summary of
 changes since the last commit.
 
 ## TODO
-[ ] Make compatible with vim8
+- [ ] Make compatible with vim8
 
 ## Requirements
 
@@ -14,10 +14,10 @@ Lightline-gitdiff is known to work with git 2.11 or above. This plugin was
 tested on Debian 9 and testing. Older versions of git should work but that is
 not guaranteed.
 
-#### Neovim
-
-This plugin uses Neovim's job-control API but in theory it should also work with
-Vim8 with some minor modifications.
+This plugin uses Neovim's job-control API if neovim is detected. Calls to `git`
+are otherwise synchronous. Note that the plugin lags on write/load if your shell
+is set to `fish` and that `has('nvim')` is `0`. Work with vim8's async features is
+planned.
 
 #### [Lightline](https://github.com/itchyny/lightline.vim)
 
