@@ -15,13 +15,18 @@ function! lightline_gitdiff#query_git()
   if l:filename !=# ''
     let l:cmd = 'git diff --stat --word-diff=porcelain ' .
     \           '--no-color --no-ext-diff -U0 -- ' . l:filename
-    let l:callbacks = {
-    \   'on_stdout': function('s:job_stdout'),
-    \   'on_stderr': function('s:job_stderr'),
-    \   'on_exit': function('s:job_exit')
-    \ }
-    let l:job_id = jobstart(l:cmd, extend({'stdout': [], 'stderr': []},
-    \                                     l:callbacks))
+    if has('nvim')
+      let l:callbacks = {
+      \   'on_stdout': function('s:job_stdout'),
+      \   'on_stderr': function('s:job_stderr'),
+      \   'on_exit': function('s:job_exit')
+      \ }
+      let l:job_id = jobstart(l:cmd, extend({'stdout': [], 'stderr': []},
+      \                                     l:callbacks))
+    else
+      let l:git_raw_output = {'stdout': split(system(l:cmd), "\n"), 'stderr': ['']}
+      call s:update_status(l:git_raw_output)
+    endif
   endif
 endfunction
 
