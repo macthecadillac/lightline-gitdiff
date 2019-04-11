@@ -24,6 +24,9 @@ function! lightline_gitdiff#query_git()
       let l:job_id = jobstart(l:cmd, extend({'stdout': [], 'stderr': []},
       \                                     l:callbacks))
     else
+      " FIXME: the update lags behind (not in a sense that it feels laggy but
+      " more like the update is not immediate and takes two refreshes to show up
+      " so the git numbers are always off by one edit
       let l:git_raw_output = {'stdout': split(system(l:cmd), "\n"), 'stderr': ['']}
       call s:update_status(l:git_raw_output)
     endif
