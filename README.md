@@ -36,10 +36,20 @@ Plug 'macthecadillac/lightline-gitdiff'
 ### Available configuration options
 
 ```vim
+" mostly cosmetic settings
 let g:lightline_gitdiff#indicator_added = '+'
-let g:lightline_gitdiff#indicator_deleted = '-'
 let g:lightline_gitdiff#indicator_modified = '!'
-let g:lightline_gitdiff#min_winwidth = '70'
+let g:lightline_gitdiff#indicator_deleted = '-'
+" disable diff stats if the window width is less than this number
+let g:lightline_gitdiff#min_winwidth = 70
+" add a space between the indicator and the diff count
+let g:lightline_gitdiff#indicator_pad = v:true
+" hide indicators that read zero
+let g:lightline_gitdiff#indicator_hide_zero = v:false
+" in case vim did not finish writing the file before we call git-diff
+let g:lightline_gitdiff#cmd_general_delay = 0.01
+" vim often takes longer on first write
+let g:lightline_gitdiff#cmd_first_write_delay = 0.5
 ```
 
 These defaults could be overridden in your configurations.
