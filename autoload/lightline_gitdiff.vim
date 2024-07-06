@@ -168,3 +168,8 @@ function! lightline_gitdiff#get_status()
     return ''
   endif
 endfunction
+
+function! lightline_gitdiff#init()
+  call lightline_gitdiff#query_git_bufenter()
+  let g:lightline#gitdiff#loaded = v:true
+endfunction
