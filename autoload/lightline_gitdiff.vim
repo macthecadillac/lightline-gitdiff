@@ -162,7 +162,7 @@ function! lightline_gitdiff#get_status()
     else
       return g:lightline_gitdiff#indicator_added . s:pad_item(l:added) . ' ' .
       \      g:lightline_gitdiff#indicator_modified . s:pad_item(l:modified) . ' ' .
-      \      g:lightline_gitdiff#indicator_deleted . s_pad_item(l:deleted)
+      \      g:lightline_gitdiff#indicator_deleted . s:pad_item(l:deleted)
     endif
   else
     return ''
